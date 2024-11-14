@@ -1,0 +1,17 @@
+{
+  "name": "zadanie-rekrutacyjne",
+  "version": "1.0.0",
+  "main": "src/app.mjs",
+  "scripts": {
+    "start": "node src/app.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "openai": "^4.72.0"
+  }
+}
