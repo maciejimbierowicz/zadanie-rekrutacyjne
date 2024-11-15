@@ -3,12 +3,16 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from 'url';
+import beautify from 'js-beautify';
 
 dotenv.config();
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY ?? '',
 });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function createCompletion(prompt) {
     try {
@@ -62,17 +66,40 @@ function writeHtmlToFile(filePath, htmlContent) {
     });
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+async function generatePreview() {
+    const templatePath = path.join(__dirname, 'szablon.html');
+    const previewPath = path.join(__dirname, 'podglad.html');
 
-const inputFilePath = path.join(__dirname, 'artykul.txt');
-const outputFilePath = path.join(__dirname, 'artykul.html');
+    try {
+        const articleContent = await readTextFile(path.join(__dirname, 'artykul.html'));
+        const templateContent = await readTextFile(templatePath);
+
+        const updatedTemplate = templateContent.replace(
+        /<body>(.*?)<\/body>/s, 
+        `<body>\n<div id="article-content">${articleContent}</div>\n</body>`
+);
+
+        const beautifiedTemplate = beautify.html(updatedTemplate, {
+            indent_size: 2,
+            space_in_empty_paren: true
+        });
+
+        const message = await writeHtmlToFile(previewPath, beautifiedTemplate);
+        console.log(message);
+    } catch (error) {
+        console.error('Error generating preview:', error);
+    }
+}
 
 async function processFile() {
+    const inputFilePath = path.join(__dirname, 'artykul.txt');
+    const outputFilePath = path.join(__dirname, 'artykul.html');
+
     try {
         const fileContent = await readTextFile(inputFilePath);
         const generatedHTML = await createCompletion(fileContent);
         const message = await writeHtmlToFile(outputFilePath, generatedHTML);
+        await generatePreview();
         console.log(message);
     } catch (error) {
         console.error('Error in processing:', error);
