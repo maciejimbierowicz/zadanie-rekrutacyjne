@@ -76,7 +76,7 @@ async function generatePreview() {
 
         const updatedTemplate = templateContent.replace(
         /<body>(.*?)<\/body>/s, 
-        `<body>\n<div id="article-content">${articleContent}</div>\n</body>`
+        `<body>\n${articleContent}</body>`
 );
 
         const beautifiedTemplate = beautify.html(updatedTemplate, {
